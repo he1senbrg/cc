@@ -1,6 +1,6 @@
 import { PredictionInputData, WaterInputData } from '../types'
 
-const API_BASE_URL = 'https://aigis-backend.agreeablestone-f005a4ec.southindia.azurecontainerapps.io'
+const API_BASE_URL = 'http://localhost:9000'
 
 export interface ServerAnalysisResponse {
   quality_analysis: string
@@ -94,4 +94,28 @@ export const generateReport = async (afterPred: ServerAnalysisResponse, language
   const fullUrl = `${API_BASE_URL}/${relativePath}`
   
   return fullUrl
+}
+
+export const downloadDataset = async (datasetId: string): Promise<string> => {
+  const response = await fetch(`${API_BASE_URL}/get_dataset`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      id: datasetId
+    })
+  })
+  
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error('Server error response:', errorText)
+    throw new Error(errorText || 'Failed to get dataset URL')
+  }
+  
+  const responseText = await response.text()
+  console.log('Dataset blob URL response:', responseText)
+  
+  // Server returns the Azure Blob Storage URL directly
+  return responseText.replace(/"/g, '') // Remove quotes if present
 }

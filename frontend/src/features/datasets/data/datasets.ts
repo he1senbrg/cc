@@ -1,10 +1,11 @@
+import { downloadDataset as apiDownloadDataset } from '@/shared/services'
 import { Dataset } from '@/shared/types'
 import gw_quality_img from "../../../shared/assets/gw_quality.jpg"
 import gw_resource_img from "../../../shared/assets/gw_resource.jpg"
 
 export const DATASETS: Dataset[] = [
   {
-    id: '1',
+    id: 'gwq',
     title: 'Ground Water Quality Dataset',
     description: 'Comprehensive water quality measurements including pH, EC, TDS, major ions, trace elements, and location data across various monitoring wells.',
     image: gw_quality_img,
@@ -20,7 +21,7 @@ export const DATASETS: Dataset[] = [
     category: 'Quality'
   },
   {
-    id: '2',
+    id: 'gwr',
     title: 'Ground Water Resource Dataset',
     description: 'Groundwater assessment data including annual draft, replenishable resources, net availability, and development stage across different blocks.',
     image: gw_resource_img,
@@ -43,14 +44,20 @@ export const downloadDataset = async (dataset: Dataset) => {
   try {
     console.log(`Downloading ${dataset.title}...`)
     
-    // Fetch the actual CSV file
-    const response = await fetch(dataset.downloadUrl)
+    // Call the backend API to get the dataset blob URL
+    const blobUrl = await apiDownloadDataset(dataset.id)
+    console.log(`Backend returned blob URL: ${blobUrl}`)
+    
+    // Fetch the CSV file from the blob URL
+    const response = await fetch(blobUrl)
+    
     if (!response.ok) {
-      throw new Error(`Failed to download ${dataset.title}`)
+      throw new Error(`Failed to fetch dataset from blob storage: ${response.statusText}`)
     }
     
     const csvContent = await response.text()
     
+    // Create and download the file
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')

@@ -8,3 +8,4 @@ google-genai
 markdown-pdf
 uvicorn
 gunicorn
+azure-storage-blob

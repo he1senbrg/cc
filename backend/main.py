@@ -5,6 +5,7 @@ import pred_level
 import pred_quality
 import json
 import ai_report
+import dataset
 import os
 import shutil
 from contextlib import asynccontextmanager
@@ -20,17 +21,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "https://aigis.vishnu.studio"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Set to False when using allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -177,3 +171,9 @@ def generate_report(data: dict):
     pdf_url = ai_report.generate(data)
 
     return pdf_url
+
+@app.post("/get_dataset")
+def download_dataset(data: dict):
+    dataset_url = dataset.download_dataset(data)
+
+    return dataset_url
