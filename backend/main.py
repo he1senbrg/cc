@@ -21,10 +21,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://aigis.vishnu.studio",
+    "https://nice-ocean-03325dd00.3.azurestaticapps.net"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
-    allow_credentials=False,  # Set to False when using allow_origins=["*"]
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
